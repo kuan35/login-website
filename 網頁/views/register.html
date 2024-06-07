@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>註冊 - 個人記事本網站</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="notebook.png">
+</head>
+<body>
+    <header>
+        <h1>註冊</h1>
+        <nav>
+            <a href="/">首頁</a>
+            <a href="/login">登入</a>
+        </nav>
+    </header>
+    <main>
+        <form id="registerForm">
+            <label for="username">用戶名:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="email">電子郵件:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">密碼:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">註冊</button>
+        </form>
+        <div id="registerMessage"></div>
+    </main>
+    <footer>
+        <p>&copy; 2024 個人記事本網站</p>
+        <p>作者: KUAN</p>
+    </footer>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password })
+            });
+            
+            const result = await response.json();
+            const messageDiv = document.getElementById('registerMessage');
+            if (result.success) {
+                messageDiv.textContent = '註冊成功！';
+                window.location.href = '/login';
+            } else {
+                messageDiv.textContent = result.message;
+            }
+        });
+    </script>
+</body>
+</html>

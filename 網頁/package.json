@@ -1,0 +1,18 @@
+{
+  "name": "personal-notebook",
+  "version": "1.0.0",
+  "description": "A personal notebook application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "init-db": "node init_db.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "sqlite3": "^5.1.7"
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "keywords": []
+}
