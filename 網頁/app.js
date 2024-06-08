@@ -35,9 +35,47 @@ app.get('/notebook-list', (req, res) => {
   if (req.session.user) {
     res.sendFile(path.join(__dirname, 'views', 'notebook-list.html'));
   } else {
-    req.session.redirectTo = req.originalUrl;  // 将当前URL存储在会话中
+    req.session.redirectTo = req.originalUrl;  // 將當前URL儲存在會話中
     res.redirect('/login');
   }
+});
+
+app.get('/change-password', (req, res) => {
+  if (req.session.user) {
+    res.sendFile(path.join(__dirname, 'views', 'change-password.html'));
+  } else {
+    req.session.redirectTo = req.originalUrl;
+    res.redirect('/login');
+  }
+});
+
+app.post('/change-password', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: '未授權的操作' });
+  }
+  
+  const { oldPassword, newPassword } = req.body;
+  const query = 'SELECT * FROM users WHERE id = ?';
+  
+  db.get(query, [req.session.user.id], (err, user) => {
+    if (err) {
+      console.error('Error querying SQLite:', err);
+      return res.status(500).json({ success: false, message: '內部伺服器錯誤' });
+    }
+
+    if (user.password !== oldPassword) {
+      return res.status(400).json({ success: false, message: '舊密碼不正確' });
+    }
+
+    const updateQuery = 'UPDATE users SET password = ? WHERE id = ?';
+    db.run(updateQuery, [newPassword, req.session.user.id], function(err) {
+      if (err) {
+        console.error('Error updating password in SQLite:', err);
+        return res.status(500).json({ success: false, message: '內部伺服器錯誤' });
+      }
+      res.json({ success: true, message: '密碼更新成功' });
+    });
+  });
 });
 
 app.post('/register', (req, res) => {
@@ -64,8 +102,8 @@ app.post('/login', (req, res) => {
       res.status(400).json({ success: false, message: 'Invalid email or password.' });
     } else {
       req.session.user = user;
-      const redirectTo = req.session.redirectTo || '/';  // 获取存储的URL或默认主页
-      delete req.session.redirectTo;  // 删除会话中的URL
+      const redirectTo = req.session.redirectTo || '/';
+      delete req.session.redirectTo;
       res.json({ success: true, message: 'Login successful.', redirectTo });
     }
   });
@@ -154,34 +192,8 @@ app.get('/note-detail/:id', (req, res) => {
   }
 });
 
-app.get('/profile', (req, res) => {
-  if (req.session.user) {
-    res.sendFile(path.join(__dirname, 'views', 'profile.html'));
-  } else {
-    req.session.redirectTo = req.originalUrl;
-    res.redirect('/login');
-  }
-});
-
-app.get('/contact', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'contact.html'));
-});
-
 app.get('/faq', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'faq.html'));
-});
-
-app.get('/search', (req, res) => {
-  if (req.session.user) {
-    res.sendFile(path.join(__dirname, 'views', 'search.html'));
-  } else {
-    req.session.redirectTo = req.originalUrl;
-    res.redirect('/login');
-  }
-});
-
-app.get('/blog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'blog.html'));
 });
 
 process.on('exit', () => {
