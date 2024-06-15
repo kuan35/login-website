@@ -43,87 +43,95 @@
         <p>&copy; 2024 個人記事本網站</p>
     </footer>
     <script>
-        function loadNotebooks() {
-            fetch('/api/notebooks')
-                .then(response => response.json())
-                .then(data => {
-                    const notebookList = document.getElementById('notebook-list');
-                    notebookList.innerHTML = '';
-                    data.notebooks.forEach(notebook => {
-                        const li = document.createElement('li');
-                        const button = document.createElement('button');
-                        button.className = 'notebook-button';
-                        button.innerHTML = `<span class="notebook-title">${notebook.title}</span><br><span class="notebook-description">${notebook.description}</span>`;
-                        button.dataset.id = notebook.id;
-                        button.addEventListener('click', () => editNotebook(notebook));
-                        li.appendChild(button);
-                        notebookList.appendChild(li);
-                    });
-                });
-        }
-
-        document.getElementById('add-notebook-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            fetch('/api/notebooks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title, description })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadNotebooks();
-                    document.getElementById('add-notebook-form').reset();
-                } else {
-                    alert('新增記事本失敗');
-                }
+        // 加載記事本列表
+    function loadNotebooks() {
+        fetch('/api/notebooks')  // 發送GET請求到API獲取記事本列表
+            .then(response => response.json())  // 解析回應為JSON格式
+         .then(data => {
+            const notebookList = document.getElementById('notebook-list');
+            notebookList.innerHTML = '';  // 清空現有的記事本列表
+            data.notebooks.forEach(notebook => {
+                const li = document.createElement('li');
+                const button = document.createElement('button');
+                button.className = 'notebook-button';
+                // 設定按鈕的內容和數據
+                button.innerHTML = `<span class="notebook-title">${notebook.title}</span><br><span class="notebook-description">${notebook.description}</span>`;
+                button.dataset.id = notebook.id;
+                button.addEventListener('click', () => editNotebook(notebook));  // 點擊按鈕時進行編輯
+                li.appendChild(button);
+                notebookList.appendChild(li);
             });
         });
+}
 
-        function editNotebook(notebook) {
-            document.querySelector('.notebook-list').style.display = 'none';
-            document.querySelector('.edit-notebook').style.display = 'block';
-            document.getElementById('edit-id').value = notebook.id;
-            document.getElementById('edit-title').value = notebook.title;
-            document.getElementById('edit-description').value = notebook.description;
-            document.getElementById('edit-content').value = notebook.content || '';
+// 新增記事本表單提交事件
+document.getElementById('add-notebook-form').addEventListener('submit', function(event) {
+    event.preventDefault();  // 阻止默認表單提交
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    fetch('/api/notebooks', {
+        method: 'POST',  // 發送POST請求新增記事本
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, description })  // 將標題和描述作為JSON字符串發送
+    })
+    .then(response => response.json())  // 解析回應為JSON格式
+    .then(data => {
+        if (data.success) {
+            loadNotebooks();  // 新增成功後重新加載記事本列表
+            document.getElementById('add-notebook-form').reset();  // 重置表單
+        } else {
+            alert('新增記事本失敗');
         }
+    });
+});
 
-        document.getElementById('edit-notebook-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('edit-id').value;
-            const title = document.getElementById('edit-title').value;
-            const description = document.getElementById('edit-description').value;
-            const content = document.getElementById('edit-content').value;
-            fetch(`/api/notebooks/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title, description, content })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelector('.notebook-list').style.display = 'block';
-                    document.querySelector('.edit-notebook').style.display = 'none';
-                    loadNotebooks();
-                } else {
-                    alert('更新記事本失敗');
-                }
-            });
-        });
+// 編輯記事本函數
+function editNotebook(notebook) {
+    document.querySelector('.notebook-list').style.display = 'none';  // 隱藏記事本列表
+    document.querySelector('.edit-notebook').style.display = 'block';  // 顯示編輯區
+    document.getElementById('edit-id').value = notebook.id;
+    document.getElementById('edit-title').value = notebook.title;
+    document.getElementById('edit-description').value = notebook.description;
+    document.getElementById('edit-content').value = notebook.content || '';
+}
 
-        document.getElementById('back-to-list').addEventListener('click', function() {
-            document.querySelector('.notebook-list').style.display = 'block';
-            document.querySelector('.edit-notebook').style.display = 'none';
-        });
+// 編輯記事本表單提交事件
+document.getElementById('edit-notebook-form').addEventListener('submit', function(event) {
+    event.preventDefault();  // 阻止默認表單提交
+    const id = document.getElementById('edit-id').value;
+    const title = document.getElementById('edit-title').value;
+    const description = document.getElementById('edit-description').value;
+    const content = document.getElementById('edit-content').value;
+    fetch(`/api/notebooks/${id}`, {
+        method: 'PUT',  // 發送PUT請求更新記事本
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, description, content })  // 將標題、描述和內容作為JSON字符串發送
+    })
+    .then(response => response.json())  // 解析回應為JSON格式
+    .then(data => {
+        if (data.success) {
+            document.querySelector('.notebook-list').style.display = 'block';  // 更新成功後顯示記事本列表
+            document.querySelector('.edit-notebook').style.display = 'none';  // 隱藏編輯區
+            loadNotebooks();  // 重新加載記事本列表
+        } else {
+            alert('更新記事本失敗');
+        }
+    });
+});
 
-        loadNotebooks();
+// 返回記事本列表按鈕點擊事件
+document.getElementById('back-to-list').addEventListener('click', function() {
+    document.querySelector('.notebook-list').style.display = 'block';  // 顯示記事本列表
+    document.querySelector('.edit-notebook').style.display = 'none';  // 隱藏編輯區
+});
+
+// 初始化時加載記事本列表
+loadNotebooks();
+
     </script>
 </body>
 </html>

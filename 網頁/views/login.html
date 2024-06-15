@@ -32,26 +32,27 @@
     </footer>
     <script>
         document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    event.preventDefault(); // 防止表單的默認提交行為
+    const email = document.getElementById('email').value; // 獲取用戶輸入的電子郵件
+    const password = document.getElementById('password').value; // 獲取用戶輸入的密碼
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
+    const response = await fetch('/login', { // 發送 POST 請求到伺服器的 /login 路徑
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // 設置請求的內容類型為 JSON
+        },
+        body: JSON.stringify({ email, password }) // 將電子郵件和密碼轉換為 JSON 字符串並作為請求的主體
+    });
 
-            const result = await response.json();
-            const messageDiv = document.getElementById('loginMessage');
-            if (result.success) {
-                window.location.href = '/notebook-list';
-            } else {
-                messageDiv.textContent = '電子郵件或密碼無效';
-            }
-        });
+    const result = await response.json(); // 解析伺服器回應的 JSON 數據
+    const messageDiv = document.getElementById('loginMessage'); // 獲取顯示訊息的 div 元素
+    if (result.success) { // 如果登入成功
+        window.location.href = '/notebook-list'; // 重定向用戶到筆記本列表頁面
+    } else { // 如果登入失敗
+        messageDiv.textContent = '電子郵件或密碼無效'; // 顯示錯誤訊息
+    }
+});
+
     </script>
 </body>
 </html>

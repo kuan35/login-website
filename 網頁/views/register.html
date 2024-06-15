@@ -33,28 +33,37 @@
     </footer>
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const response = await fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, email, password })
-            });
-            
-            const result = await response.json();
-            const messageDiv = document.getElementById('registerMessage');
-            if (result.success) {
-                messageDiv.textContent = '註冊成功！';
-                window.location.href = '/login';
-            } else {
-                messageDiv.textContent = result.message;
-            }
-        });
+    event.preventDefault();  // 阻止默認表單提交
+
+    // 獲取用戶輸入的值
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // 發送POST請求到伺服器進行註冊
+    const response = await fetch('/register', {
+        method: 'POST',  // 使用POST方法
+        headers: {
+            'Content-Type': 'application/json'  // 設置請求頭為JSON格式
+        },
+        body: JSON.stringify({ username, email, password })  // 將用戶名、電子郵件和密碼轉換為JSON字符串並發送
+    });
+
+    // 解析伺服器回應的JSON數據
+    const result = await response.json();
+    const messageDiv = document.getElementById('registerMessage');
+
+    // 根據伺服器回應結果進行處理
+    if (result.success) {
+        // 註冊成功，顯示成功訊息並跳轉到登入頁面
+        messageDiv.textContent = '註冊成功！';
+        window.location.href = '/login';
+    } else {
+        // 註冊失敗，顯示錯誤訊息
+        messageDiv.textContent = result.message;
+    }
+});
+
     </script>
 </body>
 </html>
