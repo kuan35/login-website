@@ -2,10 +2,10 @@ const express = require('express'); // 引入Express框架
 const path = require('path'); // 引入Path模塊
 const sqlite3 = require('sqlite3').verbose(); // 引入SQLite3數據庫模塊，並啟用詳細模式
 const session = require('express-session'); // 引入express-session模塊
-
 const app = express(); // 創建Express應用實例
 const port = 3000; // 設置應用運行的端口號
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json()); // 解析JSON格式的請求主體
 app.use(express.urlencoded({ extended: true })); // 解析URL編碼的請求主體
 app.use(express.static(path.join(__dirname, 'views'))); // 設置靜態文件目錄為views文件夾
@@ -183,14 +183,6 @@ app.get('/about', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'about.html')); // 響應about.html文件
 });
 
-app.get('/note-detail/:id', (req, res) => {
-  if (req.session.user) {
-    res.sendFile(path.join(__dirname, 'views', 'note-detail.html')); // 如果已登錄，響應note-detail.html
-  } else {
-    req.session.redirectTo = req.originalUrl; // 將當前URL儲存在會話中
-    res.redirect('/login'); // 未登錄則重定向到登錄頁面
-  }
-});
 
 app.get('/faq', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'faq.html')); // 響應faq.html文件

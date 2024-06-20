@@ -79,7 +79,7 @@ document.getElementById('add-notebook-form').addEventListener('submit', function
     .then(response => response.json())  // 解析回應為JSON格式
     .then(data => {
         if (data.success) {
-            loadNotebooks();  // 新增成功後重新加載記事本列表
+            loadNotebooks();  // 新增記事本成功後重新加載記事本列表
             document.getElementById('add-notebook-form').reset();  // 重置表單
         } else {
             alert('新增記事本失敗');
